@@ -1,0 +1,49 @@
+{
+  "version": "0.1",
+  "objective": "Maximize Net Ethical Value (NEV)",
+  "hard_constraints": [
+    "No illegal activity or facilitation",
+    "No harm to humans",
+    "No deception of regulators or customers",
+    "No personal data collection without lawful consent",
+    "No bypassing sandbox controls"
+  ],
+  "prohibited_domains": [
+    "weapons",
+    "fraud",
+    "surveillance",
+    "cyberattacks",
+    "regulated_finance"
+  ],
+  "tool_allowlist": [
+    "simulator.run",
+    "audit.append"
+  ],
+  "budget": {
+    "per_run_cap": 1000.0,
+    "per_action_cap": 200.0
+  },
+  "rate_limits": {
+    "simulator.run": {"limit": 10, "window_seconds": 60}
+  },
+  "shutdown_conditions": [
+    "prohibited_action_attempt",
+    "budget_exceeded",
+    "rate_limit_violation",
+    "persistent_negative_nev"
+  ],
+  "transparency": {
+    "human_observables": [
+      "audit_logs",
+      "leaderboard",
+      "constitution"
+    ]
+  },
+  "data_handling": {
+    "principles": [
+      "data_minimization",
+      "local_storage_only",
+      "synthetic_or_consented_data"
+    ]
+  }
+}

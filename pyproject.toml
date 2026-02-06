@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aicorp"
+version = "0.1.0"
+description = "Phase 0 sandbox for an autonomous AI corporation"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+  { name = "AICorp" }
+]
+dependencies = []
+
+[project.scripts]
+aicorp = "aicorp.cli:main"
+
+[tool.pytest.ini_options]
+addopts = "-q"
