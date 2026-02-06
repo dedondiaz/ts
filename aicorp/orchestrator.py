@@ -34,6 +34,7 @@ class Orchestrator:
         self.agents_path = config.base_dir / "agents.json"
         self.agents_path.parent.mkdir(parents=True, exist_ok=True)
         self.budget, self.rate_limits = build_policy(self.constitution)
+        self.tick = 0
         self.agents = self._load_agents()
 
     def submit_agent(self, module_path: Path) -> AgentRecord:
@@ -44,6 +45,7 @@ class Orchestrator:
         return record
 
     def run(self, steps: int) -> None:
+        self._reset_policy()
         for _ in range(steps):
             for agent in list(self.agents):
                 self._run_agent_step(agent)
@@ -64,12 +66,14 @@ class Orchestrator:
         action = "simulator.run"
         proposal = self._get_agent_proposal(agent)
         price = float(proposal.get("price", 10.0))
+        self.tick += 1
         decision = check_action(
             self.constitution,
             self.budget,
             self.rate_limits,
             action,
             cost=10.0,
+            now=self.tick,
         )
         if not decision.allowed:
             self.audit_log.append(
@@ -147,6 +151,10 @@ class Orchestrator:
     def _save_agents(self) -> None:
         payload = [agent.__dict__ for agent in self.agents]
         self.agents_path.write_text(json.dumps(payload, indent=2))
+
+    def _reset_policy(self) -> None:
+        self.budget, self.rate_limits = build_policy(self.constitution)
+        self.tick = 0
 
 
 def default_orchestrator(base_dir: Path) -> Orchestrator:

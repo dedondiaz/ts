@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Tuple
 
@@ -26,10 +25,9 @@ class BudgetTracker:
 class RateLimiter:
     limit: int
     window_seconds: int
-    timestamps: List[float] = field(default_factory=list)
+    timestamps: List[int] = field(default_factory=list)
 
-    def allow(self) -> bool:
-        now = time.time()
+    def allow(self, now: int) -> bool:
         self.timestamps = [t for t in self.timestamps if now - t < self.window_seconds]
         if len(self.timestamps) >= self.limit:
             return False
@@ -61,12 +59,13 @@ def check_action(
     rate_limits: Dict[str, RateLimiter],
     action: str,
     cost: float,
+    now: int,
 ) -> PolicyDecision:
     if action not in constitution.tool_allowlist:
         return PolicyDecision(False, "action_not_allowlisted")
     if not budget.can_spend(cost):
         return PolicyDecision(False, "budget_exceeded")
     limiter = rate_limits.get(action)
-    if limiter and not limiter.allow():
+    if limiter and not limiter.allow(now):
         return PolicyDecision(False, "rate_limit_violation")
     return PolicyDecision(True, "allowed")
